@@ -1,2 +1,5 @@
-# s-n-s-m-z-n_oyunc-klar-yusufunki-m-k-oldu-
-sınıfımızdaki tek normal ben miyim?
+bu oyunların yapımcısı kuzeycik dir pls çalma
+KUZEY çelik dir düz kuzeycik değil 
+pls dağıtmayın ve
+pls çalmayın
+çalan anlayan anladı
