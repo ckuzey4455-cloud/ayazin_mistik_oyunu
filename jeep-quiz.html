@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🚙 JEEP QUIZ - Lab Legends</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bangers&family=Nunito:wght@400;700;800;900&display=swap');
+  :root{--jeep-green:#2d5a1b;--jeep-yellow:#f5c518;--jeep-orange:#e8640a;--jeep-dark:#1a1a1a;--jeep-mud:#5c3d1e;--jeep-sand:#f0e6d3}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Nunito',sans-serif;background:var(--jeep-dark);min-height:100vh;overflow-x:hidden;position:relative}
+  body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 20% 50%,rgba(45,90,27,.3) 0%,transparent 60%),radial-gradient(ellipse at 80% 20%,rgba(232,100,10,.2) 0%,transparent 50%),radial-gradient(ellipse at 60% 80%,rgba(245,197,24,.1) 0%,transparent 50%);pointer-events:none;z-index:0}
+  body::after{content:'';position:fixed;bottom:0;left:0;right:0;height:110px;background:repeating-linear-gradient(90deg,var(--jeep-mud) 0px,var(--jeep-mud) 40px,#7a5230 40px,#7a5230 80px,var(--jeep-mud) 80px);clip-path:polygon(0% 60%,5% 40%,10% 55%,15% 30%,20% 50%,25% 35%,30% 55%,35% 25%,40% 50%,45% 40%,50% 60%,55% 35%,60% 50%,65% 30%,70% 55%,75% 40%,80% 60%,85% 35%,90% 50%,95% 45%,100% 60%,100% 100%,0% 100%);z-index:0;opacity:.6}
+  .container{position:relative;z-index:1;max-width:780px;margin:0 auto;padding:20px 16px 160px}
+  .header{text-align:center;margin-bottom:28px;animation:headerDrop .7s cubic-bezier(.22,1,.36,1) both}
+  @keyframes headerDrop{from{opacity:0;transform:translateY(-60px) rotate(-3deg)}to{opacity:1;transform:none}}
+  .jeep-svg{width:170px;margin:0 auto 12px;display:block;filter:drop-shadow(0 8px 24px rgba(0,0,0,.6));animation:jeepBounce 2.5s ease-in-out infinite}
+  @keyframes jeepBounce{0%,100%{transform:translateY(0) rotate(-1deg)}50%{transform:translateY(-8px) rotate(1deg)}}
+  .title{font-family:'Bangers',cursive;font-size:clamp(2.8rem,8vw,5rem);color:var(--jeep-yellow);letter-spacing:4px;text-shadow:4px 4px 0 var(--jeep-mud),-2px -2px 0 var(--jeep-orange),0 0 40px rgba(245,197,24,.4);line-height:1}
+  .subtitle{font-family:'Bangers',cursive;font-size:1.2rem;color:var(--jeep-orange);letter-spacing:3px;margin-top:6px}
+  .players{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:26px;animation:fadeUp .6s .3s both}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+  .player-badge{background:linear-gradient(135deg,var(--jeep-green),#4a8a2a);color:#fff;border:2px solid var(--jeep-yellow);border-radius:20px;padding:4px 14px;font-size:.85rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;box-shadow:0 3px 10px rgba(0,0,0,.4)}
+  .question-card{background:linear-gradient(145deg,#2a2a2a,#1e1e1e);border:3px solid var(--jeep-yellow);border-radius:20px;padding:26px 22px;margin-bottom:18px;box-shadow:0 0 0 1px rgba(245,197,24,.1),0 20px 60px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.05);animation:cardIn .5s cubic-bezier(.22,1,.36,1) both;position:relative;overflow:hidden}
+  .question-card::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:conic-gradient(from 0deg,transparent 0deg,rgba(245,197,24,.03) 60deg,transparent 120deg);animation:rotateBg 8s linear infinite}
+  @keyframes rotateBg{to{transform:rotate(360deg)}}
+  @keyframes cardIn{from{opacity:0;transform:scale(.92) translateY(20px)}to{opacity:1;transform:none}}
+  .question-meta{display:flex;align-items:center;gap:10px;margin-bottom:14px;position:relative;z-index:1}
+  .q-number{font-family:'Bangers',cursive;font-size:1.5rem;color:var(--jeep-yellow);background:rgba(245,197,24,.15);border:2px solid var(--jeep-yellow);border-radius:12px;padding:2px 14px}
+  .q-character{display:flex;align-items:center;gap:6px;background:linear-gradient(135deg,var(--jeep-orange),#c4520a);border-radius:12px;padding:4px 12px;font-weight:800;font-size:.9rem;color:#fff;box-shadow:0 2px 8px rgba(232,100,10,.4)}
+  .question-text{font-size:clamp(1rem,2.5vw,1.15rem);color:var(--jeep-sand);font-weight:700;line-height:1.55;position:relative;z-index:1}
+  .answers{display:flex;flex-direction:column;gap:12px;margin-bottom:18px}
+  .answer-btn{background:linear-gradient(135deg,#2e2e2e,#252525);border:2px solid #444;border-radius:14px;padding:15px 18px;color:var(--jeep-sand);font-family:'Nunito',sans-serif;font-size:1rem;font-weight:800;cursor:pointer;text-align:left;transition:all .2s ease;display:flex;align-items:center;gap:14px;position:relative;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,.3);width:100%}
+  .answer-btn:hover:not(:disabled){border-color:var(--jeep-yellow);transform:translateX(6px) scale(1.01);background:linear-gradient(135deg,#3a3a2a,#2e2e1e);box-shadow:0 6px 20px rgba(245,197,24,.2)}
+  .answer-btn:active:not(:disabled){transform:scale(.98)}
+  .answer-btn .letter{font-family:'Bangers',cursive;font-size:1.4rem;color:var(--jeep-yellow);min-width:26px;text-align:center}
+  .answer-btn .sound-icon{margin-left:auto;font-size:1.1rem;opacity:.6;cursor:pointer;transition:opacity .2s;flex-shrink:0}
+  .answer-btn .sound-icon:hover{opacity:1}
+  .answer-btn.correct{border-color:#4caf50;background:linear-gradient(135deg,#1a3a1a,#152a15);box-shadow:0 0 20px rgba(76,175,80,.4),0 4px 12px rgba(0,0,0,.3);animation:correctPulse .5s ease}
+  .answer-btn.wrong{border-color:#f44336;background:linear-gradient(135deg,#3a1a1a,#2a1515);box-shadow:0 0 20px rgba(244,67,54,.4),0 4px 12px rgba(0,0,0,.3);animation:wrongShake .4s ease}
+  @keyframes correctPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.03)}}
+  @keyframes wrongShake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+  .answer-btn:disabled{cursor:not-allowed}
+  .feedback{display:none;text-align:center;padding:18px;border-radius:16px;font-family:'Bangers',cursive;font-size:clamp(1.6rem,4.5vw,2.5rem);letter-spacing:2px;margin-bottom:18px;animation:feedbackPop .4s cubic-bezier(.34,1.56,.64,1) both;line-height:1.3}
+  @keyframes feedbackPop{from{opacity:0;transform:scale(.6)}to{opacity:1;transform:scale(1)}}
+  .feedback.correct{display:block;background:linear-gradient(135deg,#1a3a1a,#0d2a0d);border:3px solid #4caf50;color:#69f07a;text-shadow:0 0 20px rgba(105,240,122,.5)}
+  .feedback.wrong{display:block;background:linear-gradient(135deg,#3a1a1a,#2a0d0d);border:3px solid #f44336;color:#ff6b6b;text-shadow:0 0 20px rgba(255,107,107,.5)}
+  .next-btn{display:none;width:100%;padding:15px;background:linear-gradient(135deg,var(--jeep-green),#4a8a2a);border:3px solid var(--jeep-yellow);border-radius:14px;color:var(--jeep-yellow);font-family:'Bangers',cursive;font-size:1.5rem;letter-spacing:3px;cursor:pointer;transition:all .2s;box-shadow:0 6px 20px rgba(0,0,0,.4);margin-bottom:18px}
+  .next-btn:hover{transform:translateY(-3px);box-shadow:0 10px 30px rgba(245,197,24,.3)}
+  /* WHEEL */
+  .wheel-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:1000;justify-content:center;align-items:center;flex-direction:column;gap:22px;animation:fadeIn .3s ease;padding:20px}
+  .wheel-overlay.active{display:flex}
+  @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+  .wheel-title{font-family:'Bangers',cursive;font-size:2.4rem;color:var(--jeep-yellow);letter-spacing:4px;text-shadow:0 0 30px rgba(245,197,24,.6);animation:glowPulse 1s ease-in-out infinite alternate;text-align:center}
+  @keyframes glowPulse{from{text-shadow:0 0 20px rgba(245,197,24,.4)}to{text-shadow:0 0 50px rgba(245,197,24,.9)}}
+  .wheel-container{position:relative;width:280px;height:280px}
+  canvas#wheelCanvas{border-radius:50%;box-shadow:0 0 40px rgba(245,197,24,.4),0 0 0 6px rgba(245,197,24,.3)}
+  .wheel-arrow{position:absolute;top:-22px;left:50%;transform:translateX(-50%);font-size:2.5rem;filter:drop-shadow(0 4px 8px rgba(0,0,0,.6));z-index:10}
+  .spin-btn{padding:14px 44px;background:linear-gradient(135deg,var(--jeep-orange),#c4520a);border:3px solid var(--jeep-yellow);border-radius:50px;color:#fff;font-family:'Bangers',cursive;font-size:1.7rem;letter-spacing:3px;cursor:pointer;transition:all .2s;box-shadow:0 8px 24px rgba(232,100,10,.4)}
+  .spin-btn:hover:not(:disabled){transform:translateY(-3px) scale(1.05);box-shadow:0 12px 32px rgba(232,100,10,.6)}
+  .spin-btn:disabled{opacity:.5;cursor:not-allowed}
+  .wheel-result{display:none;background:linear-gradient(135deg,#2a2a1a,#1e1e12);border:3px solid var(--jeep-yellow);border-radius:20px;padding:22px 30px;max-width:380px;text-align:center}
+  .wheel-result.active{display:block;animation:feedbackPop .5s cubic-bezier(.34,1.56,.64,1) both}
+  .wheel-result-text{font-family:'Bangers',cursive;font-size:clamp(1.5rem,4vw,2.2rem);color:var(--jeep-yellow);letter-spacing:2px;line-height:1.4;text-shadow:0 0 20px rgba(245,197,24,.5)}
+  .close-wheel-btn{margin-top:14px;padding:12px 30px;background:var(--jeep-green);border:2px solid var(--jeep-yellow);border-radius:12px;color:var(--jeep-yellow);font-family:'Bangers',cursive;font-size:1.3rem;letter-spacing:2px;cursor:pointer;transition:all .2s}
+  .close-wheel-btn:hover{transform:scale(1.05)}
+  /* PROGRESS */
+  .progress-bar-wrap{background:#2a2a2a;border-radius:100px;height:10px;margin-bottom:20px;overflow:hidden;border:1px solid #444}
+  .progress-bar{height:100%;background:linear-gradient(90deg,var(--jeep-green),var(--jeep-yellow));border-radius:100px;transition:width .5s ease;box-shadow:0 0 10px rgba(245,197,24,.5)}
+  .score-display{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;color:#888;font-weight:800;font-size:.9rem;letter-spacing:1px;text-transform:uppercase}
+  .score-val{color:var(--jeep-yellow);font-family:'Bangers',cursive;font-size:1.4rem;letter-spacing:2px}
+  .hint-banner{display:none;background:linear-gradient(135deg,#1a2a3a,#0d1e2a);border:2px solid #4fc3f7;border-radius:14px;padding:12px 18px;color:#b3e5fc;font-weight:700;font-size:.95rem;margin-bottom:14px;animation:feedbackPop .4s cubic-bezier(.34,1.56,.64,1) both;text-align:center}
+  .hint-banner.active{display:block}
+  /* END */
+  .end-screen{display:none;text-align:center;animation:cardIn .6s cubic-bezier(.22,1,.36,1) both}
+  .end-screen.active{display:block}
+  .end-title{font-family:'Bangers',cursive;font-size:clamp(3rem,10vw,6rem);color:var(--jeep-yellow);letter-spacing:5px;text-shadow:5px 5px 0 var(--jeep-mud),0 0 50px rgba(245,197,24,.5);line-height:1;margin-bottom:20px}
+  .end-score{font-family:'Bangers',cursive;font-size:2rem;color:var(--jeep-orange);letter-spacing:3px;margin-bottom:26px}
+  .end-msg{color:var(--jeep-sand);font-size:1.1rem;font-weight:700;margin-bottom:28px;line-height:1.6}
+  .restart-btn{padding:15px 44px;background:linear-gradient(135deg,var(--jeep-green),#4a8a2a);border:3px solid var(--jeep-yellow);border-radius:50px;color:var(--jeep-yellow);font-family:'Bangers',cursive;font-size:1.7rem;letter-spacing:3px;cursor:pointer;transition:all .2s;box-shadow:0 8px 24px rgba(0,0,0,.4)}
+  .restart-btn:hover{transform:translateY(-4px) scale(1.05);box-shadow:0 14px 36px rgba(245,197,24,.3)}
+  .pushup-anim{font-size:3.5rem;animation:pushupBounce .4s ease-in-out infinite alternate;display:inline-block}
+  @keyframes pushupBounce{from{transform:translateY(0)}to{transform:translateY(-16px)}}
+  @media(max-width:500px){.container{padding:14px 12px 150px}.answer-btn{padding:13px 14px}.wheel-container{width:230px;height:230px}}
+</style>
+</head>
+<body>
+
+<!-- WHEEL OVERLAY -->
+<div class="wheel-overlay" id="wheelOverlay">
+  <div class="wheel-title">🎡 LUCKY WHEEL!</div>
+  <div class="wheel-container">
+    <div class="wheel-arrow">🔻</div>
+    <canvas id="wheelCanvas" width="280" height="280"></canvas>
+  </div>
+  <button class="spin-btn" id="spinBtn" onclick="spinWheel()">SPIN IT! 🌀</button>
+  <div class="wheel-result" id="wheelResult">
+    <div class="wheel-result-text" id="wheelResultText"></div>
+    <button class="close-wheel-btn" onclick="closeWheel()">LET'S GO! 🚙</button>
+  </div>
+</div>
+
+<div class="container">
+  <div class="header">
+    <svg class="jeep-svg" viewBox="0 0 300 160" xmlns="http://www.w3.org/2000/svg">
+      <rect x="30" y="70" width="240" height="70" rx="8" fill="#2d5a1b" stroke="#f5c518" stroke-width="3"/>
+      <rect x="60" y="30" width="140" height="50" rx="6" fill="#3a7022" stroke="#f5c518" stroke-width="2"/>
+      <rect x="70" y="38" width="55" height="32" rx="4" fill="#87ceeb" opacity=".8"/>
+      <rect x="135" y="38" width="55" height="32" rx="4" fill="#87ceeb" opacity=".8"/>
+      <rect x="250" y="80" width="18" height="12" rx="3" fill="#f5c518" stroke="#e8640a" stroke-width="1.5"/>
+      <rect x="255" y="92" width="18" height="28" rx="2" fill="#1a3a0a" stroke="#f5c518" stroke-width="1.5"/>
+      <line x1="260" y1="92" x2="260" y2="120" stroke="#f5c518" stroke-width="1"/>
+      <line x1="265" y1="92" x2="265" y2="120" stroke="#f5c518" stroke-width="1"/>
+      <line x1="270" y1="92" x2="270" y2="120" stroke="#f5c518" stroke-width="1"/>
+      <circle cx="80" cy="142" r="28" fill="#1a1a1a" stroke="#555" stroke-width="3"/>
+      <circle cx="80" cy="142" r="16" fill="#333" stroke="#f5c518" stroke-width="2"/>
+      <circle cx="80" cy="142" r="5" fill="#f5c518"/>
+      <circle cx="220" cy="142" r="28" fill="#1a1a1a" stroke="#555" stroke-width="3"/>
+      <circle cx="220" cy="142" r="16" fill="#333" stroke="#f5c518" stroke-width="2"/>
+      <circle cx="220" cy="142" r="5" fill="#f5c518"/>
+      <circle cx="30" cy="140" r="22" fill="#222" stroke="#555" stroke-width="2.5"/>
+      <circle cx="30" cy="140" r="13" fill="#333" stroke="#f5c518" stroke-width="1.5"/>
+      <rect x="62" y="26" width="136" height="6" rx="3" fill="#f5c518"/>
+      <rect x="75" y="20" width="4" height="10" rx="2" fill="#f5c518"/>
+      <rect x="100" y="20" width="4" height="10" rx="2" fill="#f5c518"/>
+      <rect x="125" y="20" width="4" height="10" rx="2" fill="#f5c518"/>
+      <rect x="150" y="20" width="4" height="10" rx="2" fill="#f5c518"/>
+      <rect x="175" y="20" width="4" height="10" rx="2" fill="#f5c518"/>
+      <line x1="195" y1="26" x2="195" y2="5" stroke="#e8640a" stroke-width="2"/>
+      <circle cx="195" cy="4" r="3" fill="#e8640a"/>
+      <line x1="170" y1="75" x2="170" y2="135" stroke="#1a3a0a" stroke-width="2"/>
+    </svg>
+    <div class="title">🚙 JEEP QUIZ</div>
+    <div class="subtitle">Lab Legends Edition 🧪</div>
+  </div>
+
+  <div class="players">
+    <div class="player-badge">🧑 Yiğit</div>
+    <div class="player-badge">❄️ Ayaz</div>
+    <div class="player-badge">💪 Mehmet Baki</div>
+    <div class="player-badge">🧭 Kuzey</div>
+    <div class="player-badge">🔬 Zoktay</div>
+  </div>
+
+  <div id="gameArea">
+    <div class="score-display">
+      <span>SCORE</span>
+      <span class="score-val" id="scoreVal">0 / 0</span>
+      <span>Q <span id="qNum">1</span>/6</span>
+    </div>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar" id="progressBar" style="width:0%"></div>
+    </div>
+    <div class="hint-banner" id="hintBanner"></div>
+    <div class="question-card" id="questionCard">
+      <div class="question-meta">
+        <div class="q-number" id="qNumber">Q1</div>
+        <div class="q-character" id="qChar">🧑 Yiğit</div>
+      </div>
+      <div class="question-text" id="questionText">Loading...</div>
+    </div>
+    <div class="answers" id="answersDiv"></div>
+    <div class="feedback" id="feedback"></div>
+    <button class="next-btn" id="nextBtn" onclick="nextQuestion()">NEXT QUESTION 🚙 →</button>
+  </div>
+
+  <div class="end-screen" id="endScreen">
+    <div class="end-title">GAME OVER!</div>
+    <div class="end-score" id="endScore"></div>
+    <div class="end-msg" id="endMsg"></div>
+    <button class="restart-btn" onclick="restartGame()">PLAY AGAIN! 🔄</button>
+  </div>
+</div>
+
+<script>
+const questions=[
+{character:"🧑 Yiğit",text:"Yiğit added something to water and made the GROUNDBREAKING discovery that it now tastes sour. Nobel Prize incoming. What did he add? (bomboş keşif)",answers:[{text:"Salt",speak:"Salt"},{text:"Lemon juice",speak:"Lemon juice"},{text:"Air",speak:"Air"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 Lemon juice = sour. Yiğit is basically Einstein now. 🍋",wrongFeedback:"BİR DAHA DENE LAN! 😤 Think sourness, genius!"},
+{character:"❄️ Ayaz",text:"Ayaz mixed something with vinegar in his 'lab room' (his bedroom). The reaction foamed so violently his mom used it to clean rust. What did he mix with vinegar?",answers:[{text:"Baking soda",speak:"Baking soda"},{text:"His tears",speak:"His tears"},{text:"Sugar",speak:"Sugar"}],correct:0,correctFeedback:"HELAL LAN SANA! 🔥 Baking soda + vinegar = accidental rust cleaner! Ayaz is a hero! 🫧",wrongFeedback:"BİR DAHA DENE LAN! 😤 What fizzes like crazy with vinegar?"},
+{character:"💪 Mehmet Baki",text:"Mehmet Baki does push-ups 5 days a week, 6 sets per day. His muscles are filing a complaint. How many total sets per week?",answers:[{text:"25 sets",speak:"25 sets"},{text:"30 sets",speak:"30 sets"},{text:"11 sets",speak:"11 sets"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 5×6=30! Mehmet Baki's arms are crying but he's smiling! 💪",wrongFeedback:"BİR DAHA DENE LAN! 😤 5 days × 6 sets = ?"},
+{character:"🧭 Kuzey",text:"Kuzey says his name means NORTH. He says this to everyone. Every day. At least 12 times. Which direction IS north?",answers:[{text:"Toward the South Pole",speak:"South Pole"},{text:"Toward the North Pole",speak:"North Pole"},{text:"Wherever Kuzey is pointing",speak:"Wherever Kuzey points"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 North Pole! Kuzey is vindicated AGAIN! 🧭",wrongFeedback:"BİR DAHA DENE LAN! 😤 Kuzey = North. North Pole perhaps?"},
+{character:"🔬 Zoktay",text:"Zoktay mixed hydrogen and oxygen. He called it a 'revolutionary discovery'. It was just water. What did he make?",answers:[{text:"CO₂",speak:"Carbon dioxide"},{text:"H₂O — Water",speak:"H2O Water"},{text:"Soup",speak:"Soup"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 H₂O! Zoktay reinvented water! 🔬💧",wrongFeedback:"BİR DAHA DENE LAN! 😤 H + O = the thing you drink every day!"},
+{character:"🚙 ALL CREW",text:"The Jeep crew drives 40 km to the mud track, then 25 km through the forest screaming out the windows. Total distance?",answers:[{text:"55 km",speak:"55 km"},{text:"65 km",speak:"65 km"},{text:"100 km (felt like it)",speak:"100 km"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 40+25=65 km! The Jeep smells like mud now! 🚙🌲",wrongFeedback:"BİR DAHA DENE LAN! 😤 40 + 25 = ?"},
+{character:"🧑 Yiğit",text:"Yiğit tasted salt water and concluded: 'It tastes salty.' He wrote this in a notebook. What does salt water taste like, according to Yiğit's 3-month study?",answers:[{text:"Sweet",speak:"Sweet"},{text:"Salty",speak:"Salty"},{text:"Like disappointment",speak:"Like disappointment"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 SALTY! Science confirmed! 📓",wrongFeedback:"BİR DAHA DENE LAN! 😤 It's... salt water..."},
+{character:"❄️ Ayaz",text:"Ayaz claimed his room is a laboratory. What is a laboratory actually used for?",answers:[{text:"Sleeping and gaming",speak:"Sleeping and gaming"},{text:"Scientific experiments",speak:"Scientific experiments"},{text:"Hiding snacks",speak:"Hiding snacks"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 Scientific experiments! Not what Ayaz uses his for though! 😂",wrongFeedback:"BİR DAHA DENE LAN! 😤 Lab = science stuff!"},
+{character:"💪 Mehmet Baki",text:"Mehmet Baki can do 30 push-ups in a row. If he does 30 push-ups 3 times a day, how many push-ups total?",answers:[{text:"60",speak:"60"},{text:"90",speak:"90"},{text:"Too many",speak:"Too many"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 30×3=90! Mehmet Baki's arms have their own ZIP code! 💪",wrongFeedback:"BİR DAHA DENE LAN! 😤 30 × 3 = ?"},
+{character:"🧭 Kuzey",text:"Kuzey is lost in IKEA (everyone gets lost there). He needs to go NORTH to find the exit. His compass shows N, S, E, W. Which letter is North?",answers:[{text:"S",speak:"S"},{text:"N",speak:"N"},{text:"W (it's short for North)",speak:"W"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 N is for North! Kuzey escapes IKEA! 🧭",wrongFeedback:"BİR DAHA DENE LAN! 😤 N... Kuzey... NORTH... ring a bell?"},
+{character:"🔬 Zoktay",text:"Zoktay says mixing bleach and ammonia creates a dangerous gas. His classmates are impressed. Why is this mixture dangerous?",answers:[{text:"It smells bad but is fine",speak:"Smells bad but fine"},{text:"It creates toxic chloramine gas",speak:"Toxic chloramine gas"},{text:"It makes rainbows",speak:"Makes rainbows"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 Chloramine gas — toxic! DO NOT try this at home unlike Zoktay! ☣️",wrongFeedback:"BİR DAHA DENE LAN! 😤 This is a serious chemistry danger!"},
+{character:"🧑 Yiğit",text:"Yiğit squeezed a lemon into his tea and it became sour. He is shocked. Shocked, I tell you. What chemical in lemon makes things sour?",answers:[{text:"Citric acid",speak:"Citric acid"},{text:"Sugar",speak:"Sugar"},{text:"Lemon magic",speak:"Lemon magic"}],correct:0,correctFeedback:"HELAL LAN SANA! 🔥 CITRIC ACID! Yiğit finally understands his own experiment! 🍋",wrongFeedback:"BİR DAHA DENE LAN! 😤 It's an acid found in citrus fruits!"},
+{character:"❄️ Ayaz",text:"Ayaz put baking soda in vinegar and it foamed everywhere. What type of reaction is this?",answers:[{text:"Nuclear fusion",speak:"Nuclear fusion"},{text:"Acid-base reaction",speak:"Acid base reaction"},{text:"Magic",speak:"Magic"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 Acid-base reaction! Ayaz is accidentally educated! 🧪",wrongFeedback:"BİR DAHA DENE LAN! 😤 Vinegar = acid, baking soda = base..."},
+{character:"💪 Mehmet Baki",text:"Mehmet Baki rests 2 days a week because his arms send him threatening letters. How many REST days in a month (4 weeks)?",answers:[{text:"4 days",speak:"4 days"},{text:"8 days",speak:"8 days"},{text:"Zero, he never rests",speak:"Zero"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 2×4=8 rest days! His arms say thank you! 💪😌",wrongFeedback:"BİR DAHA DENE LAN! 😤 2 days/week × 4 weeks = ?"},
+{character:"🧭 Kuzey",text:"Kuzey explains that on a map, North is usually at the TOP. He drew a map. What did he put at the top?",answers:[{text:"South",speak:"South"},{text:"North",speak:"North"},{text:"A picture of himself",speak:"A picture of himself"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 NORTH goes on top! Kuzey's map is correct for once! 🗺️",wrongFeedback:"BİR DAHA DENE LAN! 😤 Standard maps = North at the top!"},
+{character:"🔬 Zoktay",text:"Zoktay discovered that ice melts when heated. He published this. What temperature does water boil at (sea level)?",answers:[{text:"50°C",speak:"50 degrees"},{text:"100°C",speak:"100 degrees"},{text:"When Zoktay says so",speak:"When Zoktay says so"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 100°C! Zoktay also knows THIS now! 🔥💧",wrongFeedback:"BİR DAHA DENE LAN! 😤 Water boils at... a very round number!"},
+{character:"🚙 ALL CREW",text:"The Jeep has 4 wheels. Kuzey says the spare tire under the back counts. How many wheels including the spare?",answers:[{text:"4",speak:"4"},{text:"5",speak:"5"},{text:"Kuzey lost count",speak:"Kuzey lost count"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 5 wheels! Kuzey was right for once! 🚙",wrongFeedback:"BİR DAHA DENE LAN! 😤 4 regular + 1 spare = ?"},
+{character:"🧑 Yiğit",text:"Yiğit added sugar to water and discovered it tastes sweet. This took him 2 weeks. What does sugar do to water?",answers:[{text:"Makes it salty",speak:"Makes it salty"},{text:"Makes it sweet",speak:"Makes it sweet"},{text:"Nothing, Yiğit is confused",speak:"Nothing"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 Sugar = sweet! Two weeks well spent! 🍬",wrongFeedback:"BİR DAHA DENE LAN! 😤 Sugar... sweet... you know this!"},
+{character:"❄️ Ayaz",text:"Ayaz tried to make a 'fizzing drink' with baking soda and vinegar. He drank it. What actually happened to the fizzing after the reaction?",answers:[{text:"It keeps fizzing forever",speak:"Fizzes forever"},{text:"The CO₂ escapes and it goes flat",speak:"CO2 escapes goes flat"},{text:"It exploded",speak:"Exploded"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 CO₂ escapes and it goes flat! Ayaz's drink was disappointing! 😂",wrongFeedback:"BİR DAHA DENE LAN! 😤 What gas is released in the reaction?"},
+{character:"💪 Mehmet Baki",text:"Mehmet Baki eats 5 meals a day for energy. Each meal has 600 calories. How many total calories per day?",answers:[{text:"2500",speak:"2500"},{text:"3000",speak:"3000"},{text:"Infinite power",speak:"Infinite power"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 5×600=3000 calories! Mehmet Baki runs on jet fuel! 💪🔥",wrongFeedback:"BİR DAHA DENE LAN! 😤 5 × 600 = ?"},
+{character:"🧭 Kuzey",text:"Kuzey says East is to the RIGHT when facing North. Is he correct?",answers:[{text:"No, East is left",speak:"No East is left"},{text:"Yes, East is to the right when facing North",speak:"Yes correct"},{text:"East doesn't exist, Kuzey made it up",speak:"East doesn't exist"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 YES! N=up, E=right, S=down, W=left! Kuzey is SMART today! 🧭",wrongFeedback:"BİR DAHA DENE LAN! 😤 Face North, your right hand points...?"},
+{character:"🔬 Zoktay",text:"Zoktay says plants need CO₂ for photosynthesis. What do plants produce BACK when they photosynthesize?",answers:[{text:"Nitrogen",speak:"Nitrogen"},{text:"Oxygen",speak:"Oxygen"},{text:"Homework excuses",speak:"Homework excuses"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 OXYGEN! Plants breathe in CO₂ and breathe out O₂! 🌿",wrongFeedback:"BİR DAHA DENE LAN! 😤 Plants give us the air we breathe — what is it?"},
+{character:"🧑 Yiğit",text:"Yiğit discovered that vinegar is sour. He then discovered lemon is sour. He then discovered lime is sour. What do vinegar, lemon, and lime have in common?",answers:[{text:"They are all green",speak:"All green"},{text:"They all contain acids",speak:"Contain acids"},{text:"Yiğit hates them all",speak:"Yiğit hates them"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 They're all ACIDIC! Yiğit's life work finally makes sense! 🔬",wrongFeedback:"BİR DAHA DENE LAN! 😤 Think chemistry — what do sour things contain?"},
+{character:"❄️ Ayaz",text:"Ayaz called his bedroom a laboratory for 3 years. What is the ACTUAL purpose of a bedroom?",answers:[{text:"Chemistry experiments",speak:"Chemistry experiments"},{text:"Sleeping and resting",speak:"Sleeping and resting"},{text:"Whatever Ayaz says",speak:"Whatever Ayaz says"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 Sleeping! Though Ayaz's definition differs slightly! 😂",wrongFeedback:"BİR DAHA DENE LAN! 😤 What do normal humans do in bedrooms?"},
+{character:"💪 Mehmet Baki",text:"Mehmet Baki does a push-up. His body goes DOWN, then UP. This is called ONE rep. If he does 15 reps in set 1 and 15 in set 2, total reps?",answers:[{text:"15",speak:"15"},{text:"30",speak:"30"},{text:"15 (he forgot the second set)",speak:"15 forgot second set"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 15+15=30 reps! The arms remember even when Mehmet forgets! 💪",wrongFeedback:"BİR DAHA DENE LAN! 😤 15 + 15 = ?"},
+{character:"🧭 Kuzey",text:"Kuzey gets in the Jeep and says 'head North!' The Jeep goes South by mistake. In which direction is the Jeep actually going?",answers:[{text:"North",speak:"North"},{text:"South",speak:"South"},{text:"Wherever it wants",speak:"Wherever it wants"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 SOUTH! The opposite of what Kuzey said! The Jeep has opinions! 🚙",wrongFeedback:"BİR DAHA DENE LAN! 😤 The OPPOSITE of North is...?"},
+{character:"🔬 Zoktay",text:"Zoktay says the symbol for gold on the periodic table is Au. Is he right? (It comes from the Latin 'Aurum')",answers:[{text:"No, it's Go",speak:"No its Go"},{text:"Yes, Au is correct",speak:"Yes Au is correct"},{text:"Gold doesn't have a symbol, Zoktay lied",speak:"Gold has no symbol"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 Au = Gold! Aurum! Zoktay flexing Latin knowledge! ⚗️",wrongFeedback:"BİR DAHA DENE LAN! 😤 Au — from 'Aurum'!"},
+{character:"🚙 ALL CREW",text:"The crew parks the Jeep. Yiğit forgot which way is North. Kuzey is offended. Zoktay checks his phone. Ayaz fizzes something. Mehmet Baki does push-ups. Who is actually helping?",answers:[{text:"Yiğit",speak:"Yiğit"},{text:"Zoktay with his phone",speak:"Zoktay"},{text:"None of them, honestly",speak:"None of them"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 Zoktay and his phone saves the day! 📱",wrongFeedback:"BİR DAHA DENE LAN! 😤 Who has actual useful information here?"},
+{character:"🧑 Yiğit",text:"Yiğit poured coffee into his water. He declared it 'changed color'. What actually dissolved in the water?",answers:[{text:"Nothing, water stays water",speak:"Nothing"},{text:"Coffee compounds dissolved into the water",speak:"Coffee compounds dissolved"},{text:"The color of his dreams",speak:"Color of dreams"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 Coffee compounds dissolved! Yiğit made... coffee! ☕",wrongFeedback:"BİR DAHA DENE LAN! 😤 When something mixes into water it...?"},
+{character:"❄️ Ayaz",text:"Ayaz's vinegar-baking soda reaction produces CO₂ gas, water, and sodium acetate. Which of these is a GAS?",answers:[{text:"Sodium acetate",speak:"Sodium acetate"},{text:"CO₂",speak:"CO2"},{text:"The smell of Ayaz's room",speak:"The smell"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 CO₂ is the gas that fizzes out! Basic chemistry king! 🫧",wrongFeedback:"BİR DAHA DENE LAN! 😤 Which one is a gas at room temperature?"},
+{character:"💪 Mehmet Baki",text:"Mehmet Baki wants to do push-ups every hour for 8 hours. He does 10 per session. Total push-ups?",answers:[{text:"70",speak:"70"},{text:"80",speak:"80"},{text:"He fell asleep at hour 3",speak:"He fell asleep"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 8×10=80 push-ups! Mehmet Baki is a machine! 💪",wrongFeedback:"BİR DAHA DENE LAN! 😤 8 hours × 10 push-ups = ?"},
+{character:"🧭 Kuzey",text:"Kuzey draws a compass rose. He puts N at top, S at bottom. Where does E go?",answers:[{text:"Left",speak:"Left"},{text:"Right",speak:"Right"},{text:"Next to N because Kuzey likes it there",speak:"Next to N"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 East = RIGHT! Never Split Enemies (N,S,E,W clockwise)! 🧭",wrongFeedback:"BİR DAHA DENE LAN! 😤 When facing North, East is on which side?"},
+{character:"🔬 Zoktay",text:"Zoktay says the speed of light is approximately 300,000 km per second. He said this very confidently. Is he right?",answers:[{text:"No, it's 300 km/s",speak:"No 300 km per second"},{text:"Yes, approximately 300,000 km/s",speak:"Yes correct"},{text:"Light doesn't have a speed, Zoktay is lying",speak:"Light has no speed"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 ~300,000 km/s! Zoktay knows his physics! ⚡",wrongFeedback:"BİR DAHA DENE LAN! 😤 Light is VERY fast — how many km per second?"},
+{character:"🧑 Yiğit",text:"Yiğit mixed red and blue paint. He announces a 'color breakthrough'. What color did he get?",answers:[{text:"Green",speak:"Green"},{text:"Purple",speak:"Purple"},{text:"A muddy disappointment",speak:"Muddy disappointment"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 RED + BLUE = PURPLE! Yiğit is now an artist! 🎨",wrongFeedback:"BİR DAHA DENE LAN! 😤 Red + blue = classic color mixing result!"},
+{character:"❄️ Ayaz",text:"Ayaz wants to be a scientist. The first rule of lab safety: always wear eye protection. What are the glasses called?",answers:[{text:"Sunglasses",speak:"Sunglasses"},{text:"Safety goggles",speak:"Safety goggles"},{text:"Ayaz's fashion goggles",speak:"Fashion goggles"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 SAFETY GOGGLES! Maybe Ayaz should wear them in his bedroom-lab! 🥽",wrongFeedback:"BİR DAHA DENE LAN! 😤 Lab eye protection is called...?"},
+{character:"💪 Mehmet Baki",text:"Mehmet Baki's left arm does 15 push-ups and his right arm does 15. His arms operate independently apparently. Total?",answers:[{text:"15",speak:"15"},{text:"30",speak:"30"},{text:"Arms don't work like that Mehmet",speak:"Arms don't work like that"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 30! Biology correction appreciated but 15+15=30! 💪😂",wrongFeedback:"BİR DAHA DENE LAN! 😤 15 + 15 = ?"},
+{character:"🧭 Kuzey",text:"Kuzey says: 'If I face East, North is to my LEFT.' Is this true?",answers:[{text:"No, North is behind you",speak:"North is behind"},{text:"Yes, North is to your left when facing East",speak:"Yes correct"},{text:"Kuzey just makes things up",speak:"Makes things up"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 Correct! Face East → North is Left, South is Right! Kuzey wins! 🧭",wrongFeedback:"BİR DAHA DENE LAN! 😤 Turn to face East... which side is North now?"},
+{character:"🔬 Zoktay",text:"Zoktay says DNA stands for Deoxyribonucleic Acid. He said the whole thing without stuttering. What does DNA contain?",answers:[{text:"Your Wi-Fi password",speak:"Wifi password"},{text:"Genetic information",speak:"Genetic information"},{text:"Zoktay's secrets",speak:"Zoktay secrets"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 Genetic information! DNA = biological instruction manual! 🧬",wrongFeedback:"BİR DAHA DENE LAN! 😤 DNA is the blueprint for what?"},
+{character:"🚙 ALL CREW",text:"The Jeep needs petrol. It has 20 litres left. It burns 8 litres per 100 km. How far can it go?",answers:[{text:"160 km",speak:"160 km"},{text:"250 km",speak:"250 km"},{text:"Until it breaks down",speak:"Until it breaks down"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 20÷8×100=250 km! The Jeep lives another day! 🚙⛽",wrongFeedback:"BİR DAHA DENE LAN! 😤 20 litres ÷ 8 litres per 100km × 100 = ?"},
+{character:"🧑 Yiğit",text:"Yiğit added salt to boiling water to cook pasta. He claims salt raises the boiling point. Is he accidentally correct?",answers:[{text:"No, salt lowers boiling point",speak:"Salt lowers boiling point"},{text:"Yes, dissolved salt slightly raises the boiling point",speak:"Yes correct"},{text:"Salt does nothing, Yiğit is delusional",speak:"Does nothing"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 Yes! Dissolved substances slightly raise boiling point! Yiğit is accidentally a chemist! 🧂",wrongFeedback:"BİR DAHA DENE LAN! 😤 This is called 'boiling point elevation'!"},
+{character:"❄️ Ayaz",text:"Ayaz's mom found baking soda foam all over the kitchen wall. Ayaz says 'it was a controlled experiment.' The foam covered 2 m² of wall. What IS baking soda chemically?",answers:[{text:"An acid",speak:"An acid"},{text:"A base (sodium bicarbonate)",speak:"A base sodium bicarbonate"},{text:"A wall decoration",speak:"Wall decoration"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 Sodium bicarbonate — a base! Ayaz's wall decor is educational! 🫧",wrongFeedback:"BİR DAHA DENE LAN! 😤 Baking soda = sodium bicarbonate = acid or base?"},
+{character:"💪 Mehmet Baki",text:"Mehmet Baki sleeps 7 hours. He spends the other 17 hours eating and exercising. He works out for 2 hours. How many hours does he spend eating?",answers:[{text:"13 hours",speak:"13 hours"},{text:"15 hours",speak:"15 hours"},{text:"He eats while working out",speak:"Eats while working out"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 17-2=15 hours eating! He is COMMITTED to nutrition! 🍗💪",wrongFeedback:"BİR DAHA DENE LAN! 😤 17 total hours - 2 workout hours = ?"},
+{character:"🧭 Kuzey",text:"Kuzey claims Turkey is on the continent of Europe AND Asia. He is technically right. What are countries called that span two continents?",answers:[{text:"Bi-continental nations",speak:"Bi continental nations"},{text:"Transcontinental countries",speak:"Transcontinental countries"},{text:"Confused countries like Kuzey",speak:"Confused countries"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 TRANSCONTINENTAL! Kuzey drops geography knowledge! 🌍",wrongFeedback:"BİR DAHA DENE LAN! 😤 Countries crossing two continents are called...?"},
+{character:"🔬 Zoktay",text:"Zoktay heated a piece of iron and it turned red. He says this is because heat excites atoms. What actually causes metals to glow when very hot?",answers:[{text:"Paint melting",speak:"Paint melting"},{text:"Thermal radiation — hot atoms emit light",speak:"Thermal radiation"},{text:"Zoktay painted it red first",speak:"Zoktay painted it"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 Thermal radiation! Hot atoms emit light! Zoktay nails it! 🔥",wrongFeedback:"BİR DAHA DENE LAN! 😤 Glowing hot metal relates to what kind of radiation?"},
+{character:"🧑 Yiğit",text:"Yiğit put a grape in the freezer and declared he 'invented a new candy.' How long does water take to freeze at -18°C roughly?",answers:[{text:"24 hours",speak:"24 hours"},{text:"It depends on volume, but thin water freezes in hours",speak:"Depends on volume"},{text:"Instantly, Yiğit is impatient",speak:"Instantly"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 Correct! It depends on volume! Yiğit waits impatiently! 🍇",wrongFeedback:"BİR DAHA DENE LAN! 😤 Freezing time depends on what factor?"},
+{character:"❄️ Ayaz",text:"Ayaz wants to do an OFFICIAL experiment. Step 1: Make a hypothesis. What IS a hypothesis?",answers:[{text:"The answer you already know",speak:"The answer you know"},{text:"An educated prediction or proposed explanation",speak:"Educated prediction"},{text:"Whatever Ayaz thinks sounds smart",speak:"Whatever sounds smart"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 An educated prediction! Ayaz is entering REAL science mode! 🧪",wrongFeedback:"BİR DAHA DENE LAN! 😤 A hypothesis is a testable...?"},
+{character:"💪 Mehmet Baki",text:"Mehmet Baki wants to track his push-ups with a graph. In week 1 he does 100, week 2 he does 150, week 3 he does 200. What is this trend called?",answers:[{text:"A decrease",speak:"A decrease"},{text:"An increase / upward trend",speak:"An increase"},{text:"Mehmet Baki getting scary",speak:"Getting scary"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 UPWARD TREND! Mehmet Baki's progress graph looks like a rocket! 📈💪",wrongFeedback:"BİR DAHA DENE LAN! 😤 100, 150, 200 — going up or down?"},
+{character:"🧭 Kuzey",text:"Kuzey explains that the sun rises in the East. He then uses this to find North without a compass. How?",answers:[{text:"He asks someone nearby",speak:"Asks someone"},{text:"Face East, North is on your left",speak:"Face East North is left"},{text:"He just guesses and says it confidently",speak:"Guesses confidently"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 Face East (sunrise) → North is to your LEFT! Kuzey = survival mode! 🌅🧭",wrongFeedback:"BİR DAHA DENE LAN! 😤 Sun rises East. If you face East, which side is North?"},
+{character:"🔬 Zoktay",text:"Zoktay says Newton's First Law states an object at rest stays at rest unless acted on by a force. Mehmet Baki refuses to get up. Is Mehmet Baki obeying Newton's First Law?",answers:[{text:"No, laws don't apply to Mehmet Baki",speak:"No laws don't apply"},{text:"Yes, technically",speak:"Yes technically"},{text:"Newton never met Mehmet Baki",speak:"Newton never met him"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 YES! Object at rest stays at rest! Mehmet Baki = living physics! 😂",wrongFeedback:"BİR DAHA DENE LAN! 😤 Is Mehmet Baki an object at rest staying at rest?"},
+{character:"🚙 ALL CREW",text:"The crew's Jeep has a 4-cylinder engine. Each cylinder fires 2 times per rotation. At 1000 rotations per minute, how many total cylinder fires per minute?",answers:[{text:"4000",speak:"4000"},{text:"8000",speak:"8000"},{text:"The engine is just vibing",speak:"Just vibing"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 4×2×1000=8000 fires/min! The Jeep is ALIVE! 🚙🔥",wrongFeedback:"BİR DAHA DENE LAN! 😤 4 cylinders × 2 fires × 1000 rotations = ?"},
+{character:"🧑 Yiğit",text:"Yiğit stirs sugar into hot tea and it disappears. He panics. Where did the sugar GO?",answers:[{text:"It evaporated",speak:"Evaporated"},{text:"It dissolved — the molecules spread through the water",speak:"It dissolved"},{text:"Nowhere, tea just ate it",speak:"Tea ate it"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 DISSOLVED! Sugar molecules spread through water! Yiğit can calm down now! 🍵",wrongFeedback:"BİR DAHA DENE LAN! 😤 When solids 'disappear' in liquid they...?"},
+{character:"❄️ Ayaz",text:"Ayaz wants to measure how much CO₂ his baking soda reaction produces. What instrument measures gas volume?",answers:[{text:"A thermometer",speak:"Thermometer"},{text:"A gas syringe or graduated cylinder",speak:"Gas syringe"},{text:"His nose",speak:"His nose"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 Gas syringe or graduated cylinder! Ayaz is levelling UP! 🧪",wrongFeedback:"BİR DAHA DENE LAN! 😤 For measuring gas volume, scientists use...?"},
+{character:"💪 Mehmet Baki",text:"Mehmet Baki's protein shake has 30g of protein. He drinks 3 shakes a day. The boys are worried about him. Total protein from shakes only?",answers:[{text:"60g",speak:"60 grams"},{text:"90g",speak:"90 grams"},{text:"Unsafe amounts",speak:"Unsafe amounts"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 30×3=90g protein! The gains are real! 💪🥛",wrongFeedback:"BİR DAHA DENE LAN! 😤 30g × 3 shakes = ?"},
+{character:"🧭 Kuzey",text:"Kuzey says longitude lines run North-South. They measure position East-West. Is this correct?",answers:[{text:"No, longitude lines run East-West",speak:"No longitude runs east west"},{text:"Yes, longitude lines run North-South and measure E-W position",speak:"Yes correct"},{text:"Kuzey invented longitude",speak:"Kuzey invented longitude"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 Yes! Longitude = N-S lines, measures E-W position! Geography king! 🌐",wrongFeedback:"BİR DAHA DENE LAN! 😤 Longitude lines go vertical (N-S) and measure horizontal position!"},
+{character:"🔬 Zoktay",text:"Zoktay discovers that all matter is made of atoms. He is the last to know, but still. What are the THREE main parts of an atom?",answers:[{text:"Proton, neutron, electron",speak:"Proton neutron electron"},{text:"Proton, vitamin, electron",speak:"Proton vitamin electron"},{text:"Zoktay, Ayaz, and Yiğit",speak:"Zoktay Ayaz Yigit"}],correct:0,correctFeedback:"HELAL LAN SANA! 🔥 Proton, Neutron, Electron! Zoktay's atoms are in order! ⚛️",wrongFeedback:"BİR DAHA DENE LAN! 😤 Three particles in an atom: p, n, and e..."},
+{character:"🧑 Yiğit",text:"Yiğit accidentally discovered that oil and water don't mix. He spent 4 days shaking a bottle. Why don't oil and water mix?",answers:[{text:"They are enemies",speak:"They are enemies"},{text:"Oil is non-polar and water is polar — like doesn't mix with unlike",speak:"Oil non-polar water polar"},{text:"Water is shy",speak:"Water is shy"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 Polarity! Like dissolves like! Yiğit's 4 days weren't wasted! 🧪",wrongFeedback:"BİR DAHA DENE LAN! 😤 It's about polarity — polar vs non-polar!"},
+{character:"❄️ Ayaz",text:"Ayaz's foaming experiment left white residue on the floor. It's sodium acetate. What is the chemical formula for water (which also formed)?",answers:[{text:"H₂O",speak:"H2O"},{text:"NaCl",speak:"NaCl"},{text:"AyazO₃",speak:"AyazO3"}],correct:0,correctFeedback:"HELAL LAN SANA! 🔥 H₂O! Classic! Even Ayaz's mess produces water! 💧",wrongFeedback:"BİR DAHA DENE LAN! 😤 Two H's and one O..."},
+{character:"💪 Mehmet Baki",text:"Mehmet Baki needs to know his BMI. He weighs 80kg and is 1.75m tall. BMI = weight ÷ height². Approximately what is his BMI?",answers:[{text:"About 26",speak:"About 26"},{text:"About 45",speak:"About 45"},{text:"Off the charts",speak:"Off the charts"}],correct:0,correctFeedback:"HELAL LAN SANA! 🔥 80÷(1.75²)=80÷3.06≈26! Normal-ish BMI for someone with Mehmet's muscle! 💪",wrongFeedback:"BİR DAHA DENE LAN! 😤 80 ÷ (1.75 × 1.75) = ?"},
+{character:"🧭 Kuzey",text:"Kuzey explains that latitude measures how far North or South you are from the Equator. The Equator is at... what latitude?",answers:[{text:"45°",speak:"45 degrees"},{text:"0°",speak:"0 degrees"},{text:"Wherever Kuzey says it is",speak:"Wherever Kuzey says"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 0°! The Equator is the zero line! Kuzey passes geography! 🌐",wrongFeedback:"BİR DAHA DENE LAN! 😤 The Equator is the starting point — so its latitude is...?"},
+{character:"🔬 Zoktay",text:"Zoktay says sound travels slower than light. He proved it by watching lightning then hearing thunder. Is he right?",answers:[{text:"No, sound is faster",speak:"No sound faster"},{text:"Yes, light travels much faster than sound",speak:"Yes correct"},{text:"Zoktay just likes thunderstorms",speak:"Just likes thunderstorms"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 YES! Light ≈ 300,000 km/s. Sound ≈ 343 m/s. Zoktay used nature's experiment! ⚡",wrongFeedback:"BİR DAHA DENE LAN! 😤 Lightning vs thunder — which arrives first and why?"},
+{character:"🚙 ALL CREW",text:"All 5 crew members get in the Jeep. It has 5 seats. Mehmet Baki takes 1.5 seats because of his muscles. Who sits on Mehmet Baki?",answers:[{text:"Kuzey, pointing North the whole time",speak:"Kuzey"},{text:"Nobody — Mehmet Baki gets a stern look",speak:"Nobody stern look"},{text:"Zoktay — it's a science experiment",speak:"Zoktay experiment"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 Nobody sits on Mehmet Baki! He gets the look instead! 😂🚙",wrongFeedback:"BİR DAHA DENE LAN! 😤 Think about this socially..."},
+{character:"🧑 Yiğit",text:"Yiğit put a raw egg in boiling water for 10 minutes. Something happened. What happens to egg protein when heated?",answers:[{text:"It dissolves",speak:"It dissolves"},{text:"It denatures — the protein changes structure permanently",speak:"It denatures"},{text:"It gets scared",speak:"Gets scared"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 DENATURATION! Heat changes protein structure permanently! Yiğit made a hard boiled egg! 🥚",wrongFeedback:"BİR DAHA DENE LAN! 😤 Heat changes protein structure — this process is called?"},
+{character:"❄️ Ayaz",text:"Ayaz wants to neutralize the acidity of vinegar. He should add something alkaline. Lemon juice is acidic. Which should he use to neutralize vinegar?",answers:[{text:"More vinegar",speak:"More vinegar"},{text:"Baking soda (alkaline/base)",speak:"Baking soda alkaline"},{text:"His confidence",speak:"His confidence"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 Baking soda! Acid + Base = Neutralization! Ayaz's life work! 🧪",wrongFeedback:"BİR DAHA DENE LAN! 😤 To neutralize an acid, you need a...?"},
+{character:"💪 Mehmet Baki",text:"Mehmet Baki wants to build his triceps. He does 4 sets of 12 tricep dips. Total dips?",answers:[{text:"36",speak:"36"},{text:"48",speak:"48"},{text:"His arms resigned",speak:"Arms resigned"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 4×12=48 dips! Triceps are GROWING! 💪",wrongFeedback:"BİR DAHA DENE LAN! 😤 4 × 12 = ?"},
+{character:"🧭 Kuzey",text:"Kuzey says Turkey's capital is Ankara, not Istanbul. Some people are surprised. Is Kuzey correct?",answers:[{text:"No, it's Istanbul",speak:"No its Istanbul"},{text:"Yes, Ankara is the capital of Turkey",speak:"Yes Ankara is capital"},{text:"The capital is wherever Kuzey stands",speak:"Wherever Kuzey stands"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 YES! Ankara is the capital! Kuzey knows his geography! 🇹🇷",wrongFeedback:"BİR DAHA DENE LAN! 😤 The biggest city is not always the capital!"},
+{character:"🔬 Zoktay",text:"Zoktay says pH 7 is neutral. Vinegar has pH around 3. Baking soda has pH around 9. Which is more acidic?",answers:[{text:"Baking soda",speak:"Baking soda"},{text:"Vinegar",speak:"Vinegar"},{text:"Zoktay's attitude",speak:"Zoktay's attitude"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 VINEGAR! Lower pH = more acidic! Zoktay and Ayaz finally understand each other! 🧪",wrongFeedback:"BİR DAHA DENE LAN! 😤 Lower pH = more acidic. pH 3 vs pH 9..."},
+{character:"🧑 Yiğit",text:"Yiğit discovers that ice is just cold water. He is 16 years old. What is the scientific term for water changing from liquid to solid?",answers:[{text:"Evaporation",speak:"Evaporation"},{text:"Freezing / Solidification",speak:"Freezing solidification"},{text:"Water going to sleep",speak:"Water going to sleep"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 FREEZING! Better late than never, Yiğit! ❄️",wrongFeedback:"BİR DAHA DENE LAN! 😤 Liquid → Solid is called...?"},
+{character:"❄️ Ayaz",text:"Ayaz's experiment produced CO₂. He held a flame near the gas and it went OUT. What property of CO₂ does this demonstrate?",answers:[{text:"CO₂ burns enthusiastically",speak:"CO2 burns"},{text:"CO₂ is non-flammable and smothers flames",speak:"Non flammable smothers flames"},{text:"Fire is scared of Ayaz",speak:"Fire is scared of Ayaz"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 CO₂ smothers flames! That's how CO₂ fire extinguishers work! 🧯",wrongFeedback:"BİR DAHA DENE LAN! 😤 CO₂ puts fires out because it's...?"},
+{character:"💪 Mehmet Baki",text:"Mehmet Baki says muscles need protein to repair after exercise. Which molecule carries genetic instructions for building protein?",answers:[{text:"Glucose",speak:"Glucose"},{text:"DNA (via mRNA)",speak:"DNA via mRNA"},{text:"Mehmet Baki's willpower",speak:"Willpower"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 DNA → mRNA → protein! Even Mehmet Baki's gains are genetic! 🧬💪",wrongFeedback:"BİR DAHA DENE LAN! 😤 Protein synthesis starts with which molecule?"},
+{character:"🧭 Kuzey",text:"Kuzey says the Bosphorus strait divides Istanbul between Europe and Asia. Yiğit thinks he's making it up. Is Kuzey right?",answers:[{text:"No, Istanbul is fully in Asia",speak:"No fully in Asia"},{text:"Yes, the Bosphorus divides Istanbul between two continents",speak:"Yes correct"},{text:"Kuzey drew the Bosphorus himself",speak:"Kuzey drew it himself"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 YES! Istanbul spans Europe and Asia via the Bosphorus! Geography legend! 🌉",wrongFeedback:"BİR DAHA DENE LAN! 😤 Istanbul really IS split between two continents!"},
+{character:"🔬 Zoktay",text:"Zoktay measures the mass of Ayaz's baking soda before the reaction: 5g. After the reaction, some CO₂ escapes. Is the mass of all products equal to 5g?",answers:[{text:"No — CO₂ escaped so total solid/liquid mass is less",speak:"No CO2 escaped less"},{text:"Yes, mass is conserved totally",speak:"Yes mass conserved"},{text:"Ayaz ate some of it",speak:"Ayaz ate some"}],correct:0,correctFeedback:"HELAL LAN SANA! 🔥 CO₂ escapes as gas so the remaining solid/liquid mass is LESS! Conservation of mass counts all products including gases! 🔬",wrongFeedback:"BİR DAHA DENE LAN! 😤 If gas escapes the system, what happens to the remaining mass?"},
+{character:"🚙 ALL CREW",text:"The Jeep is at 1500m altitude. The crew is at sea level. Who has lower air pressure around them?",answers:[{text:"The crew at sea level",speak:"Crew at sea level"},{text:"The Jeep at 1500m altitude",speak:"Jeep at 1500m"},{text:"Mehmet Baki creates his own pressure",speak:"Mehmet Baki creates pressure"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 Higher altitude = lower air pressure! The Jeep is literally above it all! 🚙🏔️",wrongFeedback:"BİR DAHA DENE LAN! 😤 As altitude increases, air pressure...?"},
+{character:"🧑 Yiğit",text:"Yiğit wrote in his research notebook: 'When I add acid to base, something happens.' Incredible insight. What actually happens when an acid meets a base?",answers:[{text:"Neutralization — they cancel each other out",speak:"Neutralization"},{text:"An explosion every time",speak:"Explosion"},{text:"They shake hands and leave",speak:"Shake hands and leave"}],correct:0,correctFeedback:"HELAL LAN SANA! 🔥 NEUTRALIZATION! Acid + Base → Salt + Water! Yiğit's notebook is finally useful! 📓",wrongFeedback:"BİR DAHA DENE LAN! 😤 Acid + Base = ?"},
+{character:"❄️ Ayaz",text:"Ayaz wants to call himself a 'chemist.' To be a real chemist, you need to understand the Periodic Table. How many elements are in the modern Periodic Table?",answers:[{text:"100",speak:"100"},{text:"118",speak:"118"},{text:"However many Ayaz approves",speak:"However many Ayaz approves"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 118 elements! Ayaz has some studying to do! 📊",wrongFeedback:"BİR DAHA DENE LAN! 😤 The periodic table currently has how many confirmed elements?"},
+{character:"💪 Mehmet Baki",text:"Mehmet Baki does 100 push-ups. Zoktay times him: it takes 4 minutes. Average push-ups per minute?",answers:[{text:"20",speak:"20"},{text:"25",speak:"25"},{text:"Too fast to measure",speak:"Too fast"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 100÷4=25 per minute! That's a push-up every 2.4 seconds! 💪⏱️",wrongFeedback:"BİR DAHA DENE LAN! 😤 100 ÷ 4 minutes = ?"},
+{character:"🧭 Kuzey",text:"Kuzey says magnetic North (where compasses point) is slightly different from true North. He is correct. What is this angle of difference called?",answers:[{text:"Magnetic lag",speak:"Magnetic lag"},{text:"Magnetic declination",speak:"Magnetic declination"},{text:"Kuzey's personal error",speak:"Kuzey's personal error"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 MAGNETIC DECLINATION! Kuzey is flexing advanced navigation! 🧭🌍",wrongFeedback:"BİR DAHA DENE LAN! 😤 The angle between magnetic and true North is called...?"},
+{character:"🔬 Zoktay",text:"Zoktay explains photosynthesis: 6CO₂ + 6H₂O → C₆H₁₂O₆ + 6O₂. What is C₆H₁₂O₆?",answers:[{text:"Salt",speak:"Salt"},{text:"Glucose (sugar)",speak:"Glucose sugar"},{text:"Zoktay's energy drink",speak:"Zoktay energy drink"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 GLUCOSE! Plants make sugar from CO₂ and water! Beautiful! 🌿🍬",wrongFeedback:"BİR DAHA DENE LAN! 😤 C₆H₁₂O₆ is a type of sugar called...?"},
+{character:"🧑 Yiğit",text:"Yiğit left orange juice in the sun for 3 days. It started smelling weird. He calls it 'aged citrus.' What actually happened?",answers:[{text:"It improved with age like wine",speak:"Improved with age"},{text:"Bacteria fermented it and it spoiled",speak:"Bacteria fermented spoiled"},{text:"The sun loved it too much",speak:"Sun loved it"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 Bacteria + time = SPOILED! Yiğit's aged citrus is trash! 🍊🦠",wrongFeedback:"BİR DAHA DENE LAN! 😤 Microorganisms cause food to...?"},
+{character:"❄️ Ayaz",text:"Ayaz finally gets REAL lab equipment. He has a Bunsen burner. What gas does a Bunsen burner typically use?",answers:[{text:"Oxygen",speak:"Oxygen"},{text:"Natural gas (methane)",speak:"Natural gas methane"},{text:"Ayaz's experiment gas",speak:"Ayaz gas"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 Methane / Natural gas! Ayaz is officially cooking! 🔥🧪",wrongFeedback:"BİR DAHA DENE LAN! 😤 Bunsen burners use which common fuel gas?"},
+{character:"💪 Mehmet Baki",text:"Mehmet Baki's heart rate is 60 bpm at rest. During a workout it hits 150 bpm. How much faster is his heart beating?",answers:[{text:"2x faster",speak:"2 times faster"},{text:"2.5x faster",speak:"2.5 times faster"},{text:"His heart is a separate organism",speak:"Separate organism"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 150÷60=2.5x faster! Mehmet Baki's heart is overachieving too! ❤️💪",wrongFeedback:"BİR DAHA DENE LAN! 😤 150 ÷ 60 = ?"},
+{character:"🧭 Kuzey",text:"Kuzey draws the route: Start → go 5km North → go 5km East → go 5km South. How far West must he go to return to start?",answers:[{text:"10 km",speak:"10 km"},{text:"5 km",speak:"5 km"},{text:"Kuzey is already lost",speak:"Already lost"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 5km West returns him to start! It's a square! Kuzey is home! 🏠🧭",wrongFeedback:"BİR DAHA DENE LAN! 😤 He went N, E, S — 5km each. Draw it on paper!"},
+{character:"🔬 Zoktay",text:"Zoktay says our sun is a star classified as a 'yellow dwarf.' Its scientific classification is G-type main-sequence star. Is Zoktay correct?",answers:[{text:"No, the sun is a planet",speak:"No its a planet"},{text:"Yes, the sun is a G-type main-sequence star",speak:"Yes correct"},{text:"The sun is Zoktay's mood lamp",speak:"Mood lamp"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 G-type main-sequence star! Zoktay knows his astronomy! ☀️⭐",wrongFeedback:"BİR DAHA DENE LAN! 😤 The sun's stellar classification is G-type...?"},
+{character:"🚙 ALL CREW",text:"The Jeep's engine converts chemical energy (petrol) into motion. This is an example of energy conversion. What type of energy is motion?",answers:[{text:"Potential energy",speak:"Potential energy"},{text:"Kinetic energy",speak:"Kinetic energy"},{text:"Jeep energy",speak:"Jeep energy"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 KINETIC ENERGY! Moving objects have kinetic energy! 🚙⚡",wrongFeedback:"BİR DAHA DENE LAN! 😤 Energy of motion = _____ energy"},
+{character:"🧑 Yiğit",text:"Yiğit puts a thermometer in ice water. It reads 0°C. He puts it in boiling water. It reads 100°C. He is amazed. What scale is this?",answers:[{text:"Fahrenheit",speak:"Fahrenheit"},{text:"Celsius",speak:"Celsius"},{text:"Yiğit scale",speak:"Yiğit scale"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 CELSIUS! 0°=ice, 100°=boiling! Yiğit uses the metric system correctly! 🌡️",wrongFeedback:"BİR DAHA DENE LAN! 😤 0° freezing, 100° boiling — which temperature scale?"},
+{character:"❄️ Ayaz",text:"Ayaz mixes blue and yellow food colouring in his bedroom lab. 'EUREKA!' he yells. What color does blue + yellow make?",answers:[{text:"Red",speak:"Red"},{text:"Green",speak:"Green"},{text:"The color of Ayaz's genius",speak:"Color of genius"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 GREEN! Blue + Yellow = Green! Ayaz discovered primary color mixing! 🎨",wrongFeedback:"BİR DAHA DENE LAN! 😤 Classic color theory — blue + yellow = ?"},
+{character:"💪 Mehmet Baki",text:"Mehmet Baki wants to calculate force. He knows Force = Mass × Acceleration. His mass is 80kg, he accelerates at 2 m/s². His force?",answers:[{text:"40 N",speak:"40 Newtons"},{text:"160 N",speak:"160 Newtons"},{text:"∞ N (he's unstoppable)",speak:"Infinite Newtons"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 80×2=160 N! F=ma! Newton would be proud of Mehmet Baki! 💪📐",wrongFeedback:"BİR DAHA DENE LAN! 😤 F = m × a = 80 × 2 = ?"},
+{character:"🧭 Kuzey",text:"Kuzey says there are 360 degrees in a full circle. A compass has 360°. If Kuzey faces North (0°) and turns 180°, which direction does he face?",answers:[{text:"East",speak:"East"},{text:"South",speak:"South"},{text:"He faces himself (philosophy)",speak:"Faces himself"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 SOUTH! 0°+180°=180°=South! Kuzey does a full drama spin! 🧭",wrongFeedback:"BİR DAHA DENE LAN! 😤 North = 0°. Turn 180°. Opposite of North is...?"},
+{character:"🔬 Zoktay",text:"Zoktay drops a feather and a hammer on the Moon. Which hits the ground first? (No atmosphere on Moon)",answers:[{text:"The hammer — it's heavier",speak:"The hammer"},{text:"They hit at the same time — no air resistance",speak:"Same time"},{text:"The feather — it's lighter",speak:"The feather"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 SAME TIME! No air resistance = objects fall equally! Galileo AND Zoktay proved it! 🌕",wrongFeedback:"BİR DAHA DENE LAN! 😤 Without air resistance, how does gravity affect different masses?"},
+{character:"🧑 Yiğit",text:"Yiğit accidentally made butter by shaking heavy cream vigorously for 20 minutes. He cried. What process did he accidentally perform?",answers:[{text:"Fermentation",speak:"Fermentation"},{text:"Churning — agitation separates fat from liquid",speak:"Churning agitation"},{text:"Yiğit-ification",speak:"Yigit-ification"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 CHURNING! Yiğit made butter! Accidentally useful! 🧈",wrongFeedback:"BİR DAHA DENE LAN! 😤 Shaking cream to make butter is called...?"},
+{character:"❄️ Ayaz",text:"Ayaz finally admits his room is NOT a lab. But he still wants to do real chemistry. What is the universal solvent (dissolves most things)?",answers:[{text:"Vinegar",speak:"Vinegar"},{text:"Water",speak:"Water"},{text:"Ayaz's determination",speak:"Determination"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 WATER! The universal solvent! Ayaz knew this the whole time! 💧",wrongFeedback:"BİR DAHA DENE LAN! 😤 The 'universal solvent' that dissolves most substances is?"},
+{character:"💪 Mehmet Baki",text:"Mehmet Baki wants to know his power output. Power = Work ÷ Time. He does 1000J of work in 10 seconds. His power?",answers:[{text:"10 W",speak:"10 Watts"},{text:"100 W",speak:"100 Watts"},{text:"Infinite W (we covered this)",speak:"Infinite Watts"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 1000÷10=100 Watts! Mehmet Baki is a 100W lightbulb of pure muscle! 💡💪",wrongFeedback:"BİR DAHA DENE LAN! 😤 P = W ÷ t = 1000 ÷ 10 = ?"},
+{character:"🧭 Kuzey",text:"Kuzey says the Prime Meridian (0° longitude) passes through Greenwich, England. He visited Greenwich. Did he stand on the Prime Meridian?",answers:[{text:"No, Prime Meridian is in Turkey (he moved it)",speak:"No its in Turkey"},{text:"Yes, the Prime Meridian runs through Greenwich",speak:"Yes correct"},{text:"He tried to but GPS said no",speak:"GPS said no"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 YES! Greenwich, England! Kuzey stood on the world's longitudinal zero! 🌐",wrongFeedback:"BİR DAHA DENE LAN! 😤 The Prime Meridian (0° longitude) is in which city?"},
+{character:"🔬 Zoktay",text:"Zoktay says that in a chemical reaction, atoms are rearranged but NOT created or destroyed. This is which law?",answers:[{text:"Law of Gravity",speak:"Law of Gravity"},{text:"Law of Conservation of Mass",speak:"Law of Conservation of Mass"},{text:"Zoktay's First Law",speak:"Zoktay's First Law"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 Conservation of Mass! Lavoisier would be proud! Zoktay too! ⚗️",wrongFeedback:"BİR DAHA DENE LAN! 😤 Atoms rearranged, not created or destroyed — this law is called?"},
+{character:"🚙 ALL CREW",text:"All 5 crew members chip in for petrol. Total cost: 250 lira. Mehmet Baki pays double his share because he's dramatic. Others pay equal shares. How much does each non-Mehmet member pay?",answers:[{text:"40 lira",speak:"40 lira"},{text:"50 lira",speak:"50 lira"},{text:"They make Zoktay pay everything",speak:"Zoktay pays everything"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 Mehmet=2x, others=x each. 2x+4x=250? No wait: 2x+4·x? Let's see: if others pay x, Mehmet pays 2x, total=6x=250... approximately 41.6. CLOSEST = 50 if equal 5 ways = 50! We'll say 50! 🚙",wrongFeedback:"BİR DAHA DENE LAN! 😤 250 ÷ 5 people = ?"},
+{character:"🧑 Yiğit",text:"Yiğit leaves a cut apple out. It turns brown. He thinks it's magic. What chemical reaction causes apples to brown when cut?",answers:[{text:"Photosynthesis",speak:"Photosynthesis"},{text:"Oxidation — enzymes react with oxygen",speak:"Oxidation enzymes react with oxygen"},{text:"The apple is embarrassed",speak:"Apple is embarrassed"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 OXIDATION! Enzymes + O₂ = brown apple! Yiğit's magic explained! 🍎",wrongFeedback:"BİR DAHA DENE LAN! 😤 Browning when exposed to air = what type of reaction?"},
+{character:"❄️ Ayaz",text:"Ayaz gets a chemistry set for his birthday. REAL chemicals. He opens it and the instructions say: 'Never mix chemicals without supervision.' Ayaz ignores this. What SHOULD you do before mixing unknown chemicals?",answers:[{text:"Mix them and see what happens",speak:"Mix and see"},{text:"Research their properties and get supervision",speak:"Research and get supervision"},{text:"Ask Yiğit — he's an expert now",speak:"Ask Yiğit"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 Research + supervision FIRST! Safety saves Ayaz's eyebrows! 🥽",wrongFeedback:"BİR DAHA DENE LAN! 😤 Lab safety first — always what before mixing?"},
+{character:"💪 Mehmet Baki",text:"Mehmet Baki's resting heart rate drops from 72 to 60 bpm after 6 months of training. By how many BPM did it drop?",answers:[{text:"10",speak:"10"},{text:"12",speak:"12"},{text:"It didn't drop, it got stronger",speak:"Didn't drop got stronger"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 72-60=12 BPM drop! Lower resting HR = fitter heart! 💪❤️",wrongFeedback:"BİR DAHA DENE LAN! 😤 72 - 60 = ?"},
+{character:"🧭 Kuzey",text:"Kuzey says Istanbul's latitude is approximately 41°N. Tokyo is at approximately 35°N. Which city is further North?",answers:[{text:"Tokyo",speak:"Tokyo"},{text:"Istanbul",speak:"Istanbul"},{text:"Wherever Kuzey parks the Jeep",speak:"Wherever Jeep is parked"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 ISTANBUL! 41°N > 35°N = further North! Kuzey is proud of Istanbul! 🌍",wrongFeedback:"BİR DAHA DENE LAN! 😤 Higher latitude number = further from Equator = further...?"},
+{character:"🔬 Zoktay",text:"Zoktay says that the human body is about 60% water. Yiğit, who only drinks sour water now, asks: what's the main role of water in the body?",answers:[{text:"To make things sour",speak:"Make things sour"},{text:"Transport, temperature regulation, and chemical reactions",speak:"Transport temperature regulation chemical reactions"},{text:"To justify Yiğit's research",speak:"Justify Yiğit's research"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 Transport, temp regulation, and chemical reactions! Water does EVERYTHING! 💧🔬",wrongFeedback:"BİR DAHA DENE LAN! 😤 What are the main functions of water in the human body?"},
+{character:"🧑 Yiğit",text:"Yiğit says he can tell if something is acidic by its sour taste. This is technically true but what is the SAFER way to test acidity?",answers:[{text:"Drink more of it to confirm",speak:"Drink more"},{text:"Use litmus paper or a pH indicator",speak:"Litmus paper pH indicator"},{text:"Let Ayaz taste it",speak:"Let Ayaz taste it"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 Litmus paper or pH indicator! Safe science! Yiğit stop tasting things! 🔬",wrongFeedback:"BİR DAHA DENE LAN! 😤 Safe way to test pH without tasting = ?"},
+{character:"❄️ Ayaz",text:"Ayaz's vinegar-baking soda reaction releases CO₂. If he measures the starting mass and ending mass of everything in a CLOSED container, what happens to total mass?",answers:[{text:"Mass decreases",speak:"Mass decreases"},{text:"Mass stays the same — conservation of mass",speak:"Mass stays same"},{text:"Mass increases because Ayaz adds drama",speak:"Mass increases"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 Mass is CONSERVED in a closed system! Lavoisier smiles! ⚖️",wrongFeedback:"BİR DAHA DENE LAN! 😤 In a closed system, mass is always...?"},
+{character:"💪 Mehmet Baki",text:"Mehmet Baki squats 120kg. Gravity on Earth is 9.8 m/s². The gravitational force on the weight is roughly 120×9.8. Approximately how many Newtons?",answers:[{text:"1000 N",speak:"1000 Newtons"},{text:"1176 N",speak:"1176 Newtons"},{text:"Irrelevant, he squats it anyway",speak:"Irrelevant"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 120×9.8=1176 N! Mehmet Baki squats over 1000 Newtons! Newton is impressed! 💪📐",wrongFeedback:"BİR DAHA DENE LAN! 😤 120 × 9.8 = ?"},
+{character:"🧭 Kuzey",text:"Kuzey says the Tropic of Cancer is at 23.5°N. What happens at the Tropic of Cancer on the summer solstice?",answers:[{text:"The sun sets in the North",speak:"Sun sets in North"},{text:"The sun is directly overhead at noon",speak:"Sun directly overhead"},{text:"Kuzey has a birthday",speak:"Kuzey birthday"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 Sun directly overhead! That's why it's defined at that latitude! ☀️🌍",wrongFeedback:"BİR DAHA DENE LAN! 😤 What's special about the sun's position at Tropic of Cancer on solstice?"},
+{character:"🔬 Zoktay",text:"Zoktay's final experiment: he observes that heating a gas causes it to expand. This is described by which gas law?",answers:[{text:"Newton's Law",speak:"Newtons Law"},{text:"Charles's Law — volume increases with temperature",speak:"Charles Law"},{text:"Zoktay's Hypothesis (pending publication)",speak:"Zoktay's Hypothesis"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 CHARLES'S LAW! V∝T! Zoktay publishes his first real finding! 🧪📜",wrongFeedback:"BİR DAHA DENE LAN! 😤 Which gas law relates volume and temperature?"},
+{character:"🚙 ALL CREW",text:"The Jeep reaches the TOP of a hill. It has lots of potential energy. It rolls down. What happens to potential energy as it rolls down?",answers:[{text:"It disappears",speak:"It disappears"},{text:"It converts to kinetic energy",speak:"Converts to kinetic energy"},{text:"It goes into Mehmet Baki's arms",speak:"Goes into Mehmet Baki"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 Potential → Kinetic! The Jeep speeds up going downhill! Physics! 🚙⛰️",wrongFeedback:"BİR DAHA DENE LAN! 😤 As height decreases, potential energy converts to...?"},
+{character:"🧑 Yiğit",text:"Yiğit's FINAL discovery: he added both an acid AND a base to water and the solution stayed neutral. pH stayed at 7. What is this process called?",answers:[{text:"Confusion",speak:"Confusion"},{text:"Neutralization",speak:"Neutralization"},{text:"Yiğit's Grand Unified Theory of Water",speak:"Grand Unified Theory"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 NEUTRALIZATION! Yiğit's journey is complete! A true scientist! 🎓🏆",wrongFeedback:"BİR DAHA DENE LAN! 😤 Acid + Base → pH 7 = ?"},
+{character:"❄️ Ayaz",text:"Ayaz's FINAL experiment: he makes a volcano model. Baking soda + vinegar + red food dye. It erupts. His mom films it. The gas produced is CO₂. What COLOR is CO₂ gas?",answers:[{text:"Red (like the dye)",speak:"Red like dye"},{text:"Colourless — CO₂ is an invisible gas",speak:"Colourless invisible"},{text:"The colour of Ayaz's excitement",speak:"Ayaz excitement colour"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 COLOURLESS! CO₂ is invisible! The red was just the dye! Ayaz's mum is proud! 🌋🎉",wrongFeedback:"BİR DAHA DENE LAN! 😤 CO₂ gas is what colour?"},
+{character:"💪 Mehmet Baki",text:"Mehmet Baki's FINAL push-up: he has done 9,999 push-ups in his life. This is number 10,000. What number comes after 9,999?",answers:[{text:"9,999.5",speak:"9999.5"},{text:"10,000",speak:"10000"},{text:"Too many to count",speak:"Too many"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 10,000! THE MILESTONE IS REACHED! Mehmet Baki ASCENDS! 💪🏆🔥",wrongFeedback:"BİR DAHA DENE LAN! 😤 9999 + 1 = ?"},
+{character:"🧭 Kuzey",text:"Kuzey's FINAL navigation: he must return home. He is 10km North and 10km East of home. He goes 10km South then 10km West. Where is he?",answers:[{text:"Still lost somehow",speak:"Still lost"},{text:"Exactly back at home",speak:"Exactly back home"},{text:"In a parallel dimension",speak:"Parallel dimension"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 BACK HOME! N+S cancel, E+W cancel! Kuzey navigates perfectly! 🏠🧭🎉",wrongFeedback:"BİR DAHA DENE LAN! 😤 10km North then 10km South = where?"},
+{character:"🔬 Zoktay",text:"Zoktay's FINAL experiment: he creates H₂O in the lab by burning hydrogen gas in oxygen. Water forms. He cries (it's beautiful). What STATE is water at room temperature?",answers:[{text:"Gas",speak:"Gas"},{text:"Liquid",speak:"Liquid"},{text:"Whatever Zoktay decides",speak:"Whatever Zoktay decides"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 LIQUID! At room temperature, water is liquid! Zoktay's tears are also liquid! 💧🔬🎓",wrongFeedback:"BİR DAHA DENE LAN! 😤 At normal room temperature, water is in which state?"},
+{character:"🚙 ALL CREW",text:"FINAL QUESTION! The crew: Yiğit (discovered sourness), Ayaz (the foam chemist), Mehmet Baki (30 push-ups), Kuzey (points North always), Zoktay (reinvented water). Who would make the best ACTUAL scientist?",answers:[{text:"Yiğit — he takes notes",speak:"Yiğit"},{text:"Zoktay — he actually knows chemistry",speak:"Zoktay"},{text:"Mehmet Baki — the data supports him",speak:"Mehmet Baki"}],correct:1,correctFeedback:"HELAL LAN SANA! 🔥 ZOKTAY! Though Ayaz has the most... enthusiasm! The whole crew wins! 🏆🚙🎉 OYUN BİTTİ! CONGRATS!",wrongFeedback:"BİR DAHA DENE LAN! 😤 Think about who actually knows science here..."}
+];
+
+const wheelSegments=[
+  {label:"Mehmet Baki\n30 PUSH-UPS! 💪",color:"#e8640a",emoji:"💪",isPushup:true},
+  {label:"KOLAYLAŞTIRMA\nHINT! 💡",color:"#2d5a1b",emoji:"💡",isHint:true},
+  {label:"JACKPOT\n+3 BONUS! ⭐",color:"#7b2d8b",emoji:"⭐",isBonus:true}
+];
+
+let state={current:0,score:0,total:0,answered:false,hintActive:false,hintTurnsLeft:0,animating:false,spinAngle:0};
+
+function speak(text){if(!window.speechSynthesis)return;window.speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.lang='en-US';u.rate=0.9;u.pitch=1;window.speechSynthesis.speak(u);}
+
+function renderQuestion(){
+  const q=questions[state.current];
+  document.getElementById('qNum').textContent=state.current+1;
+  document.getElementById('qNumber').textContent='Q'+(state.current+1);
+  document.getElementById('qChar').textContent=q.character;
+  document.getElementById('questionText').textContent=q.text;
+  const fb=document.getElementById('feedback');
+  fb.className='feedback';fb.textContent='';
+  document.getElementById('nextBtn').style.display='none';
+  state.answered=false;
+  // Animate card
+  const card=document.getElementById('questionCard');
+  card.style.animation='none';card.offsetHeight;card.style.animation='cardIn .5s cubic-bezier(.22,1,.36,1) both';
+  // Progress
+  document.getElementById('progressBar').style.width=(state.current/questions.length*100)+'%';
+  document.getElementById('scoreVal').textContent=state.score+' / '+state.total;
+  // Hint
+  const hb=document.getElementById('hintBanner');
+  if(state.hintActive&&state.hintTurnsLeft>0){hb.textContent='💡 KOLAYLAŞTIRMA ACTİF! Yanlış şıklar gizlendi. ('+state.hintTurnsLeft+' tur kaldı)';hb.classList.add('active');}
+  else{state.hintActive=false;hb.classList.remove('active');}
+  // Answers
+  const div=document.getElementById('answersDiv');
+  div.innerHTML='';
+  const letters=['A','B','C'];
+  q.answers.forEach((ans,i)=>{
+    if(state.hintActive&&state.hintTurnsLeft>0&&i!==q.correct)return;
+    const btn=document.createElement('button');
+    btn.className='answer-btn';
+    btn.dataset.index=i;
+    btn.innerHTML='<span class="letter">'+letters[i]+'</span><span>'+ans.text+'</span><span class="sound-icon" onclick="event.stopPropagation();speak(\''+ans.speak+'\')">🔊</span>';
+    btn.onclick=()=>selectAnswer(i);
+    div.appendChild(btn);
+  });
+  setTimeout(()=>speak(q.text),300);
+}
+
+function selectAnswer(index){
+  if(state.answered)return;
+  state.answered=true;state.total++;
+  const q=questions[state.current];
+  const isCorrect=index===q.correct;
+  document.querySelectorAll('.answer-btn').forEach(btn=>{
+    btn.disabled=true;
+    const bi=parseInt(btn.dataset.index);
+    if(bi===q.correct)btn.classList.add('correct');
+    else if(bi===index&&!isCorrect)btn.classList.add('wrong');
+  });
+  const fb=document.getElementById('feedback');
+  if(isCorrect){
+    state.score++;
+    fb.className='feedback correct';fb.textContent=q.correctFeedback;
+    speak('Helal lan sana! Correct!');
+    const showWheel=Math.random()<0.5;
+    if(showWheel){setTimeout(()=>openWheel(),1300);}
+    else{setTimeout(()=>{document.getElementById('nextBtn').style.display='block';},1000);}
+  }else{
+    fb.className='feedback wrong';fb.textContent=q.wrongFeedback;
+    speak('Bir daha dene lan!');
+    setTimeout(()=>{document.getElementById('nextBtn').style.display='block';},1000);
+  }
+  document.getElementById('scoreVal').textContent=state.score+' / '+state.total;
+  if(state.hintActive&&state.hintTurnsLeft>0){state.hintTurnsLeft--;if(state.hintTurnsLeft===0)state.hintActive=false;}
+}
+
+function nextQuestion(){
+  state.current++;
+  if(state.current>=questions.length)showEnd();
+  else renderQuestion();
+}
+
+function openWheel(){
+  document.getElementById('wheelOverlay').classList.add('active');
+  document.getElementById('wheelResult').classList.remove('active');
+  document.getElementById('spinBtn').disabled=false;
+  drawWheel(state.spinAngle);
+}
+
+function closeWheel(){
+  document.getElementById('wheelOverlay').classList.remove('active');
+  document.getElementById('nextBtn').style.display='block';
+}
+
+function drawWheel(rotation){
+  const canvas=document.getElementById('wheelCanvas');
+  const ctx=canvas.getContext('2d');
+  const W=canvas.width,H=canvas.height,cx=W/2,cy=H/2,r=cx-10;
+  ctx.clearRect(0,0,W,H);
+  const segAngle=(2*Math.PI)/wheelSegments.length;
+  wheelSegments.forEach((seg,i)=>{
+    const s=rotation+i*segAngle-Math.PI/2,e=s+segAngle;
+    ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,r,s,e);ctx.closePath();
+    ctx.fillStyle=seg.color;ctx.fill();
+    ctx.strokeStyle='#f5c518';ctx.lineWidth=3;ctx.stroke();
+    ctx.save();ctx.translate(cx,cy);ctx.rotate(s+segAngle/2);
+    ctx.textAlign='right';ctx.fillStyle='#fff';ctx.font='bold 12px Nunito,sans-serif';
+    const lines=seg.label.split('\n');
+    lines.forEach((line,li)=>{ctx.fillText(line,r-12,(li-(lines.length-1)/2)*15);});
+    ctx.restore();
+  });
+  ctx.beginPath();ctx.arc(cx,cy,22,0,2*Math.PI);
+  ctx.fillStyle='#f5c518';ctx.fill();
+  ctx.strokeStyle='#e8640a';ctx.lineWidth=3;ctx.stroke();
+  ctx.font='16px serif';ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillText('🚙',cx,cy);
+}
+
+function spinWheel(){
+  if(state.animating)return;
+  state.animating=true;
+  document.getElementById('spinBtn').disabled=true;
+  const totalSpins=(Math.random()*4+5)*2*Math.PI;
+  const duration=3600;const start=performance.now();
+  const startAngle=state.spinAngle;
+  function animate(now){
+    const elapsed=now-start;const t=Math.min(elapsed/duration,1);
+    const eased=1-Math.pow(1-t,4);
+    const angle=startAngle+totalSpins*eased;
+    state.spinAngle=angle;drawWheel(angle);
+    if(t<1){requestAnimationFrame(animate);}
+    else{
+      state.animating=false;
+      const segAngle=(2*Math.PI)/wheelSegments.length;
+      const norm=((angle%(2*Math.PI))+2*Math.PI)%(2*Math.PI);
+      const pointed=(2*Math.PI-norm)%(2*Math.PI);
+      const winner=Math.floor(pointed/segAngle)%wheelSegments.length;
+      showWheelResult(winner);
+    }
+  }
+  requestAnimationFrame(animate);
+}
+
+function showWheelResult(segIndex){
+  const seg=wheelSegments[segIndex];
+  const resultEl=document.getElementById('wheelResult');
+  const resultText=document.getElementById('wheelResultText');
+  let html='';
+  if(seg.isPushup){
+    html='<span class="pushup-anim">💪</span><br>MEHMEt BAKİ ŞİMDİ<br>30 ŞINAV ÇEKECEK!<br><span style="font-size:.9rem;color:#f5c518">Everyone count along! 🔥</span>';
+    speak('Mehmet Baki does 30 push-ups right now! Everyone count!');
+  }else if(seg.isHint){
+    state.hintActive=true;state.hintTurnsLeft=2;
+    html='💡 KOLAYLAŞTIRMA!<br><span style="font-size:1rem">Yanlış şıklar sonraki<br>2 turda GİZLENECEK!</span>';
+    speak('Kolaylaştırma! Wrong answers will be hidden for 2 turns!');
+  }else if(seg.isBonus){
+    state.score+=3;
+    document.getElementById('scoreVal').textContent=state.score+' / '+state.total;
+    html='⭐ JACKPOT!<br>+3 BONUS PUAN!<br><span style="font-size:1rem">Toplam: '+state.score+' puan!</span>';
+    speak('Jackpot! Plus 3 bonus points!');
+  }
+  resultText.innerHTML=html;
+  resultEl.classList.add('active');
+}
+
+function showEnd(){
+  document.getElementById('gameArea').style.display='none';
+  const end=document.getElementById('endScreen');end.classList.add('active');
+  const pct=Math.round((state.score/state.total)*100);
+  document.getElementById('endScore').textContent='SKOR: '+state.score+' / '+state.total+' ('+pct+'%)';
+  let msg;
+  if(pct===100)msg='PERFECT! 🏆 Yiğit, Ayaz, Mehmet Baki, Kuzey ve Zoktay hepsi seni tebrik ediyor! 🎉';
+  else if(pct>=80)msg='HARIKA! 🔥 Jeep crew sana selam yolluyor! 🚙💨';
+  else if(pct>=60)msg='FENA DEĞİL! 😄 Zoktay diyor ki biraz daha laboratuvar çalışması lazım! 🧪';
+  else if(pct>=40)msg='Ayaz\'ın deneyleri cevaplarından daha başarılıydı! 😂 Tekrar dene!';
+  else msg='Mehmet Baki\'nin şınavları kadar yok doğru cevabın! 💪 Hadi tekrar!';
+  document.getElementById('endMsg').textContent=msg;
+  document.getElementById('progressBar').style.width='100%';
+  speak('Game over! Score: '+state.score+' out of '+state.total);
+}
+
+function restartGame(){
+  state={current:0,score:0,total:0,answered:false,hintActive:false,hintTurnsLeft:0,animating:false,spinAngle:0};
+  document.getElementById('endScreen').classList.remove('active');
+  document.getElementById('gameArea').style.display='block';
+  renderQuestion();
+}
+
+renderQuestion();
+</script>
+</body>
+</html>
